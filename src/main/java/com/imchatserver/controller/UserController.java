@@ -42,7 +42,7 @@ public class UserController {
             return Result.error(409, "Duplicate registration");
         } else {
             userMapper.insert(user);
-            return Result.success(user);
+            return Result.success(userMapper.selectOne(new QueryWrapper<User>().eq("jobno", user.getJobno())));
         }
     }
 
@@ -64,7 +64,7 @@ public class UserController {
 
     @GetMapping("/selectusers")
     public Result<List<User>> SelectUsers (String jobno, String info) {
-        List<User> users = userMapper.selectList(new QueryWrapper<User>().ne("jobno", jobno));
+        List<User> users = userMapper.selectList(new QueryWrapper<User>().ne("jobno", jobno).ne("jobno", "000"));
         for (int i = 0; i < users.size(); i++) {
             if (!users.get(i).getJobno().contains(info) && !users.get(i).getNickname().contains(info)) {
                 users.remove(i);

@@ -27,13 +27,14 @@ public class FileController {
         try {
             System.out.println(jobno);
             System.out.println(file);
-            String staticPath = "/home/myh/Documents/Code/imchat-server/src/main/resources/static/";
-            String classStaticPath = "/home/myh/Documents/Code/imchat-server/target/classes/static/";
+            String staticPath = "/home/myh/Documents/MyObject/imchat-server/src/main/resources/static/";
+            String classStaticPath = "/home/myh/Documents/MyObject/imchat-server/target/classes/static/";
             String filetype = ".png";
-            System.out.println(jobno + filetype);
             File f = new File(classStaticPath + jobno + filetype);
             file.transferTo(f);
-            Files.copy(Path.of(classStaticPath + jobno + filetype), Path.of(staticPath + jobno + filetype));
+            File dest = new File(staticPath + jobno + filetype);
+            if (dest.exists()) dest.delete();
+            Files.copy(f.toPath(), dest.toPath());
             userMapper.update(null, new UpdateWrapper<User>().eq("jobno", jobno).set("pic", "/images/" + jobno + filetype));
             return Result.success("http://ip-location:8086/images/" + jobno + filetype);
         } catch (IOException e) {

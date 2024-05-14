@@ -1,9 +1,7 @@
 package com.imchatserver.component;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,11 +67,6 @@ public class WebSocketServer {
         sessionPools.put(uno, session);
         addOnlineCount();
         System.out.println("===>工号：" + uno + "，加入webSocket连接，当前人数为" + onlineNum);
-        // 广播上线消息
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", "on");
-        jsonObject.put("uno", uno);
-        broadcast(JSON.toJSONString(jsonObject,true));
     }
 
     //关闭连接时调用
@@ -82,23 +75,16 @@ public class WebSocketServer {
         sessionPools.remove(uno);
         subOnlineCount();
         System.out.println("===>工号：" + uno + "，断开webSocket连接，当前人数为" + onlineNum);
-        // 广播下线消息
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", "off");
-        jsonObject.put("uno", uno);
-        broadcast(JSON.toJSONString(jsonObject,true));
     }
 
     //收到客户端信息后，根据接收人的uno把消息推下去或者群发
     @OnMessage
     public void onMessage(String message, @PathParam(value = "uno") String uno) {
-        System.out.println(uno);
         Messages msg=JSON.parseObject(message, Messages.class);
-        System.out.println(msg);
-        if (Objects.equals(msg.getTo(), "0")) {
+        if (Objects.equals(msg.getCno(), "0")) {
             broadcast(msg.getText());
         } else {
-            unicast(msg.getTo(), msg.getText());
+            unicast(msg.getCno(), msg.getText());
         }
     }
 

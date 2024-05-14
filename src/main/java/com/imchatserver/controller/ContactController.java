@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/contact")
@@ -44,17 +45,34 @@ public class ContactController {
         return Result.success(contact);
     }
 
+    @GetMapping("/getagree")
+    public Result<Boolean> GetAgree(String uno, String cno) {
+        Contact contact = contactMapper.selectOne(new QueryWrapper<Contact>().eq("uno", cno).eq("cno", uno));
+        if (!Objects.isNull(contact)) {
+            if (!contact.getAgree()) {
+                contactMapper.update(null, new UpdateWrapper<Contact>().eq("uno", cno).eq("cno", uno).set("agree", true));
+            }
+            return Result.success(true);
+        }
+        contact = contactMapper.selectOne(new QueryWrapper<Contact>().eq("uno", uno).eq("cno", cno));
+        if (!Objects.isNull(contact)) {
+            if (contact.getAgree()) {
+                return Result.success(true);
+            }
+        }
+        return Result.success(false);
+    }
+
     @PutMapping("/agree")
-    public Result<Contact> ConsentRequest(String uno, String cno) {
-        Contact contact;
+    public Result<User> ConsentRequest(String uno, String cno) {
         if (contactMapper.selectCount(new QueryWrapper<Contact>().eq("uno", uno).eq("cno", cno)) == 0) {
             String temp = uno;
             uno = cno;
             cno = temp;
         }
         contactMapper.update(null, new UpdateWrapper<Contact>().eq("uno", uno).eq("cno", cno).set("agree", true));
-        contact = new Contact(uno, cno, true);
-        return Result.success(contact);
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("jobno", uno));
+        return Result.success(user);
     }
 
     @DeleteMapping("/forget")

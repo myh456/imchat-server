@@ -14,6 +14,7 @@ public class Contact {
     public Contact(String uno, String cno) {
         this.uno = uno;
         this.cno = cno;
+        this.agree = false;
     }
 
     public Contact(String uno, String cno, Boolean agree) {
